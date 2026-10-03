@@ -104,7 +104,7 @@ export default function Site() {
         <div className="shell hero-inner">
           <div className="hero-content">
             <div className="hero-mark" aria-hidden="true"><span className="hero-mark-reveal"><span className="hero-mark-float"><Image src="/assets/brand-symbol-transparent.png" alt="" width={180} height={180} priority /></span></span><span className="hero-logo-scan" /></div>
-            <h1 id="hero-title" aria-label={headlineLines.join(" ")}>{headlineLines.map((line, lineIndex) => <span className="hero-line" aria-hidden="true" key={line}>{line.split(" ").map((word, wordIndex) => <span key={wordIndex}><span className="hero-word-clip"><span className="hero-word" style={{ "--word-delay": `${.08 + lineIndex * .08 + wordIndex * .018}s` } as CSSProperties}>{word}</span></span>{" "}</span>)}</span>)}</h1>
+            <h1 id="hero-title" aria-label={headlineLines.join(" ")}>{headlineLines.map((line, lineIndex) => <span className="hero-line" aria-hidden="true" key={line}>{line.split(" ").map((word, wordIndex) => <span key={wordIndex}><span className="hero-word-clip"><span className="hero-word" style={{ "--word-delay": `${.8 + lineIndex * .24 + wordIndex * .09}s` } as CSSProperties}>{word}</span></span>{" "}</span>)}</span>)}</h1>
             <p className="hero-copy">User behaviour, market research and competitor intelligence for clearer business decisions.</p>
             <div className="hero-actions"><a className="primary-button hero-primary" href="#contact">Discuss a project</a><a className="hero-secondary" href="#services">Our services</a></div>
           </div>
