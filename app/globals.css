@@ -151,25 +151,25 @@ main>section{scroll-margin-top:0}
 .site-header .theme-button:hover{background:color-mix(in srgb,var(--text) 8%,transparent)}
 .logo-scroll{opacity:calc(var(--backdrop-opacity) * var(--logo-visibility,.35))}
 .hero{min-height:100svh;height:auto;max-height:none}
-.hero-signals{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent);-webkit-mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent);animation:signal-field-in 2.1s var(--motion-utility) both}
+.hero-signals{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent);-webkit-mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent);animation:signal-field-in .7s var(--motion-utility) both}
 .hero-inner{display:grid;grid-template-rows:1fr auto;min-height:100svh;height:auto;padding-top:var(--header-offset)}
 .hero-content{width:100%;max-width:1040px;align-self:center;justify-self:center;display:flex;flex-direction:column;align-items:center;text-align:center;padding:56px 0 38px}
 .hero-mark{position:relative;width:86px;height:124px;margin-bottom:28px;perspective:650px;animation:none}
 .hero-mark-reveal,.hero-mark-float{position:absolute;inset:0;display:block}
-.hero-mark-reveal{animation:hero-logo-reveal 1.65s var(--motion-state) both}
-.hero-mark-float{animation:hero-logo-hover 8s var(--motion-utility) 1.8s infinite}
+.hero-mark-reveal{animation:hero-logo-reveal .55s var(--motion-state) both}
+.hero-mark-float{animation:hero-logo-hover 8s var(--motion-utility) .6s infinite}
 .hero-mark img{position:absolute;width:154px;height:154px;max-width:none;left:-34px;top:-19px;animation:none}
-.hero-logo-scan{position:absolute;left:50%;top:-20%;width:1px;height:140%;background:linear-gradient(transparent,color-mix(in srgb,var(--gold) 65%,#fff),transparent);box-shadow:0 0 12px color-mix(in srgb,var(--gold) 40%,transparent);animation:hero-logo-scan 1.65s var(--motion-utility) both;pointer-events:none}
+.hero-logo-scan{position:absolute;left:50%;top:-20%;width:1px;height:140%;background:linear-gradient(transparent,color-mix(in srgb,var(--gold) 65%,#fff),transparent);box-shadow:0 0 12px color-mix(in srgb,var(--gold) 40%,transparent);animation:hero-logo-scan .55s var(--motion-utility) both;pointer-events:none}
 .hero[data-hero-visible=false] .hero-mark-float{animation-play-state:paused}
 .hero h1{width:100%;max-width:1040px;margin:0;font-family:var(--sans);font-size:clamp(42px,4.4vw,68px);font-weight:500;line-height:1.08;letter-spacing:-.045em;text-wrap:balance;animation:none}
 .hero h1>span{display:block}
 .hero h1>span+span{margin-top:5px}
 .hero-word-clip{display:inline-block;vertical-align:bottom;overflow:hidden;padding-bottom:.12em;margin-bottom:-.12em}
-.hero-word{display:inline-block;animation:hero-word-in .9s var(--motion-entry) var(--word-delay) both}
-.hero-copy{max-width:520px;margin-top:24px;color:var(--muted);font-size:16px;line-height:1.7;text-wrap:balance;animation:hero-copy-in .7s var(--motion-entry) 1.85s both}
+.hero-word{display:inline-block;animation:hero-word-in .45s var(--motion-entry) var(--word-delay) both}
+.hero-copy{max-width:520px;margin-top:24px;color:var(--muted);font-size:16px;line-height:1.7;text-wrap:balance;animation:hero-copy-in .4s var(--motion-entry) .12s both}
 .hero-actions{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:28px;animation:none}
-.hero-actions>a{animation:hero-button-in .6s var(--motion-entry) 2.25s backwards}
-.hero-actions>a:nth-child(2){animation-delay:2.4s}
+.hero-actions>a{animation:hero-button-in .35s var(--motion-entry) .14s backwards}
+.hero-actions>a:nth-child(2){animation-delay:.2s}
 .hero-primary,.hero-secondary{min-height:48px;padding:12px 24px;border-radius:999px;font-size:14px;line-height:1.5;font-weight:500}
 .hero-primary{background:var(--text);color:var(--bg);border-color:var(--text);justify-content:center;gap:0}
 .hero-primary:hover{background:color-mix(in srgb,var(--text) 90%,var(--gold));transform:translateY(-2px)}
@@ -177,7 +177,7 @@ main>section{scroll-margin-top:0}
 .hero-secondary:hover{border-color:var(--muted);background:color-mix(in srgb,var(--text) 4%,transparent);transform:translateY(-2px)}
 .hero-secondary:active{transform:scale(.98)}
 .hero-floor{margin-top:0;min-height:74px;justify-content:center;padding:12px 0 20px}
-.hero-floor .scroll-cue{animation:hero-reveal .4s var(--motion-entry) 2.6s both}
+.hero-floor .scroll-cue{animation:hero-reveal .3s var(--motion-entry) .2s both}
 @keyframes hero-reveal{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes hero-logo-reveal{from{opacity:0;transform:rotateY(-78deg) rotateZ(-8deg) scale(.95)}to{opacity:1;transform:rotateY(0) rotateZ(0) scale(1)}}
 @keyframes hero-logo-scan{0%{opacity:0;transform:translateX(-70px) rotate(10deg)}35%{opacity:.6}75%{opacity:.4}100%{opacity:0;transform:translateX(70px) rotate(10deg)}}
@@ -207,3 +207,23 @@ main>section{scroll-margin-top:0}
 @media(max-width:359px){.site-header .brand{font-size:14px}.hero-content{padding:30px 0 22px}.hero h1{font-size:28px;line-height:1.12}.hero-mark{margin-bottom:22px}.hero-primary,.hero-secondary{padding:12px 16px}}
 @media(max-height:620px) and (min-width:761px){.hero-content{padding:26px 0 20px}.hero-mark{width:64px;height:92px;margin-bottom:16px}.hero-mark img{width:116px;height:116px;left:-26px;top:-14px}.hero h1{font-size:clamp(38px,4vw,54px)}.hero-copy{margin-top:18px}.hero-actions{margin-top:20px}.hero-floor{min-height:54px}}
 @media(prefers-reduced-motion:reduce){.hero-mark,.hero-mark-reveal,.hero-mark-float,.hero-mark img,.hero h1,.hero-word,.hero-copy,.hero-actions,.hero-actions>a,.hero-floor .scroll-cue,.brand-mark-turn{animation:none;transform:none;filter:none;opacity:1}.hero-logo-scan,.site-header .brand-mark-turn:after{display:none}.hero-word-clip{overflow:visible}}
+
+/* One second entrance, a still 1.5 second hold, then a half second aperture exit. */
+@property --intro-aperture{syntax:'<length>';inherits:false;initial-value:0px}
+html{scrollbar-gutter:stable}
+html:has(.intro-screen){overflow:hidden}
+.intro-screen{position:fixed;inset:0;z-index:300;background:#000;display:grid;place-items:center;overflow:hidden;isolation:isolate;--intro-aperture:0px;mask-image:radial-gradient(circle at 50% 50%,transparent var(--intro-aperture),#000 calc(var(--intro-aperture) + 1px));-webkit-mask-image:radial-gradient(circle at 50% 50%,transparent var(--intro-aperture),#000 calc(var(--intro-aperture) + 1px))}
+.intro-art{width:min(900px,94vw,88svh);aspect-ratio:1;opacity:0;transform-origin:center}
+.intro-art img{display:block;width:100%;height:100%;object-fit:contain}
+.intro-screen.phase-entering .intro-art{animation:intro-picture-in 1s var(--motion-state) both}
+.intro-screen.phase-holding .intro-art{opacity:1;transform:none}
+.intro-screen.phase-exiting{animation:intro-circle-out .5s var(--motion-utility) both}
+.intro-screen.phase-exiting .intro-art{animation:intro-picture-zoom .5s var(--motion-utility) both}
+.intro-screen[data-circular=false].phase-exiting{mask-image:none;-webkit-mask-image:none;animation:intro-fade-out .5s var(--motion-utility) both}
+.site-content:is([data-intro=pending],[data-intro=opening]) :is(.header-inner,.hero-signals,.hero-mark-reveal,.hero-mark-float,.hero-logo-scan,.hero-word,.hero-copy,.hero-actions>a,.hero-floor .scroll-cue){animation-play-state:paused}
+.site-content:not([data-intro=ready]) .site-header .brand-mark-turn,.site-content:not([data-intro=ready]) .site-header .brand-mark-turn:after{animation-play-state:paused}
+@keyframes intro-picture-in{from{opacity:0;transform:perspective(1000px) translateY(12px) rotateY(-24deg) scale(.92)}to{opacity:1;transform:perspective(1000px) translateY(0) rotateY(0) scale(1)}}
+@keyframes intro-circle-out{from{--intro-aperture:0px}to{--intro-aperture:100vmax}}
+@keyframes intro-picture-zoom{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(1.25)}}
+@keyframes intro-fade-out{from{opacity:1}to{opacity:0}}
+@media(prefers-reduced-motion:reduce){.intro-screen{display:none}.intro-art{animation:none;transform:none}.site-content :is(.hero-word,.hero-copy,.hero-actions>a){opacity:1;transform:none}}
