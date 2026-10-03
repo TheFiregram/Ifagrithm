@@ -21,20 +21,21 @@ export default function HeroSignals() {
     function paint(time: number) {
       if (!el || !ctx) return;
       ctx.clearRect(0, 0, width, height);
-      const gap = width < 761 ? 19 : 16;
-      const colour = light ? "151,106,0" : "255,196,37";
+      const gap = width < 761 ? 12 : 9;
+      const colour = light ? "103,95,80" : "116,116,125";
+      const accent = light ? "151,106,0" : "255,196,37";
       for (let row = 0, y = 8; y < height; row++, y += gap) {
         for (let col = 0, x = 8; x < width; col++, x += gap) {
           const wave = Math.sin(x * .009 + y * .006 - time * .45);
           const ripple = Math.cos(y * .014 - x * .003 + time * .3);
           const edge = Math.min(1, Math.min(x, width - x) / 100);
           const centre = 1 - .65 * Math.exp(-(((x - width / 2) / (width * .3)) ** 2 + ((y - height * .48) / (height * .32)) ** 2));
-          const alpha = (.07 + (wave + 1) * .05 + (ripple + 1) * .018) * edge * centre;
+          const alpha = (.07 + (wave + 1) * .042 + (ripple + 1) * .018) * edge * centre;
           ctx.fillStyle = `rgba(${colour},${alpha})`;
           ctx.fillRect(x, y + wave * 3, 1.3, 1.3);
           if ((row * 31 + col * 17) % 139 === 0) {
             const pulse = Math.max(0, Math.sin(time * .7 + row + col));
-            ctx.fillStyle = `rgba(${colour},${(.12 + pulse * .42) * edge})`;
+            ctx.fillStyle = `rgba(${accent},${(.12 + pulse * .42) * edge})`;
             ctx.fillRect(x - .4, y + wave * 3 - .4, 2.1, 2.1);
           }
         }

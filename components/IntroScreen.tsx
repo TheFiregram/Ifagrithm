@@ -73,6 +73,6 @@ export default function IntroScreen({ onStageChange }: { onStageChange: (stage: 
     <div ref={cover} className={`intro-screen phase-${phase}`} data-circular={circular} role="status" aria-label="IFAGRITHM">
       <div className="intro-art"><Image ref={image} src="/assets/intro-brand.jpg" alt="IFAGRITHM" width={1280} height={1280} priority /></div>
     </div>
-    <noscript><style>{`.intro-screen{display:none!important}.site-content .hero *,.site-content .header-inner,.site-content .reveal{animation:none!important;opacity:1!important;transform:none!important;filter:none!important}`}</style></noscript>
+    <noscript><style>{`.intro-screen{display:none!important}.site-content .hero *,.site-content .header-inner,[data-reveal-section] .enter-item,.faq-row,.method-row,.method-avatar,.pixel-heart i{animation:none!important;opacity:1!important;filter:none!important;transform:none!important}.features-scroll,.method-scroll,.focus-scroll,.faq-scroll,.outro-scroll{height:auto!important}.features-sticky,.method-sticky,.focus-sticky,.faq-sticky,.outro-sticky{position:relative!important;height:auto!important;min-height:600px}.feature-card{display:block!important;max-height:none!important}.feature-copy-stack{min-height:0!important}.feature-copy{position:relative!important;opacity:1!important;filter:none!important;transform:none!important;margin:40px 0}.feature-right,.feature-rail{display:none!important}.faq-answer{grid-template-rows:1fr!important;opacity:1!important}html{overflow:auto!important}`}</style></noscript>
   </>;
 }
