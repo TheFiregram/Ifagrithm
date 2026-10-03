@@ -39,14 +39,14 @@ export default function IntroScreen({ onStageChange }: { onStageChange: (stage: 
       setPhase("entering");
       onStageChange("opening");
       // A missing animation event must never leave the page covered.
-      timers.push(setTimeout(finish, 3500));
+      timers.push(setTimeout(finish, 4000));
     }
     function animationEnded(event: AnimationEvent) {
       if (!active || finished) return;
       if (event.animationName === "intro-picture-in" && !entered) {
         entered = true;
         setPhase("holding");
-        timers.push(setTimeout(exit, 1500));
+        timers.push(setTimeout(exit, 1000));
       }
       if (event.target === el && (event.animationName === "intro-circle-out" || event.animationName === "intro-fade-out")) finish();
     }

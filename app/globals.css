@@ -208,7 +208,7 @@ main>section{scroll-margin-top:0}
 @media(max-height:620px) and (min-width:761px){.hero-content{padding:26px 0 20px}.hero-mark{width:64px;height:92px;margin-bottom:16px}.hero-mark img{width:116px;height:116px;left:-26px;top:-14px}.hero h1{font-size:clamp(38px,4vw,54px)}.hero-copy{margin-top:18px}.hero-actions{margin-top:20px}.hero-floor{min-height:54px}}
 @media(prefers-reduced-motion:reduce){.hero-mark,.hero-mark-reveal,.hero-mark-float,.hero-mark img,.hero h1,.hero-word,.hero-copy,.hero-actions,.hero-actions>a,.hero-floor .scroll-cue,.brand-mark-turn{animation:none;transform:none;filter:none;opacity:1}.hero-logo-scan,.site-header .brand-mark-turn:after{display:none}.hero-word-clip{overflow:visible}}
 
-/* One second entrance, a still 1.5 second hold, then a half second aperture exit. */
+/* One second entrance, a still one second hold, then a 1.5 second aperture exit. */
 @property --intro-aperture{syntax:'<length>';inherits:false;initial-value:0px}
 html{scrollbar-gutter:stable}
 html:has(.intro-screen){overflow:hidden}
@@ -217,9 +217,9 @@ html:has(.intro-screen){overflow:hidden}
 .intro-art img{display:block;width:100%;height:100%;object-fit:contain}
 .intro-screen.phase-entering .intro-art{animation:intro-picture-in 1s var(--motion-state) both}
 .intro-screen.phase-holding .intro-art{opacity:1;transform:none}
-.intro-screen.phase-exiting{animation:intro-circle-out .5s var(--motion-utility) both}
-.intro-screen.phase-exiting .intro-art{animation:intro-picture-zoom .5s var(--motion-utility) both}
-.intro-screen[data-circular=false].phase-exiting{mask-image:none;-webkit-mask-image:none;animation:intro-fade-out .5s var(--motion-utility) both}
+.intro-screen.phase-exiting{animation:intro-circle-out 1.5s var(--motion-utility) both}
+.intro-screen.phase-exiting .intro-art{animation:intro-picture-zoom 1.5s var(--motion-utility) both}
+.intro-screen[data-circular=false].phase-exiting{mask-image:none;-webkit-mask-image:none;animation:intro-fade-out 1.5s var(--motion-utility) both}
 .site-content:is([data-intro=pending],[data-intro=opening]) :is(.header-inner,.hero-signals,.hero-mark-reveal,.hero-mark-float,.hero-logo-scan,.hero-word,.hero-copy,.hero-actions>a,.hero-floor .scroll-cue){animation-play-state:paused}
 .site-content:not([data-intro=ready]) .site-header .brand-mark-turn,.site-content:not([data-intro=ready]) .site-header .brand-mark-turn:after{animation-play-state:paused}
 @keyframes intro-picture-in{from{opacity:0;transform:perspective(1000px) translateY(12px) rotateY(-24deg) scale(.92)}to{opacity:1;transform:perspective(1000px) translateY(0) rotateY(0) scale(1)}}
