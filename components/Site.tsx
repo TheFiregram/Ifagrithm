@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import LogoBackdrop from "./LogoBackdrop";
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import HeroSignals from "./HeroSignals";
+import { type CSSProperties, type FormEvent, useEffect, useRef, useState } from "react";
 
 const EMAIL = "Ifagrithm@gmail.com";
 const X_URL = "https://x.com/ifagrithm?s=11";
 const LINKEDIN_URL = "https://www.linkedin.com/company/ifagrithm/";
+const headlineLines = ["Understand your users.", "Find where growth can come from."];
 const services = [
   { title: "User & Behaviour", suffix: "Research", description: "Understand how people use your product, what different user groups do, and how activity changes over time.", outputs: ["Behaviour segments", "User journey analysis", "Retention and activity research"] },
   { title: "Market & Competitor", suffix: "Intelligence", description: "Investigate competing products, market activity and the alternatives your users already choose.", outputs: ["Competitor studies", "Market briefs", "Product comparisons"] },
@@ -20,7 +22,7 @@ const steps = [
 ];
 
 function Brand({ footer = false }: { footer?: boolean }) {
-  return <a className={`brand${footer ? " footer-brand" : ""}`} href="#top" aria-label="IFAGRITHM home"><span className="brand-icon"><Image src={"/assets/brand-symbol-transparent.png"} alt="" width={70} height={70} priority /></span><span>IFAGRITHM</span></a>;
+  return <a className={`brand${footer ? " footer-brand" : ""}`} href="#top" aria-label="IFAGRITHM home"><span className="brand-icon"><span className="brand-mark-turn"><Image src={"/assets/brand-symbol-transparent.png"} alt="" width={70} height={70} priority /></span></span><span>IFAGRITHM</span></a>;
 }
 
 export default function Site() {
@@ -98,10 +100,11 @@ export default function Site() {
     <header className="site-header"><div className="shell header-inner"><Brand /><nav id="primary-navigation" className={`navigation${menu ? " open" : ""}`} aria-label="Main navigation"><a href="#services" onClick={() => setMenu(false)}>Services</a><a href="#approach" onClick={() => setMenu(false)}>Approach</a><a className="nav-cta" href="#contact" onClick={() => setMenu(false)}>Discuss a project <span className="button-orb" aria-hidden="true" /></a></nav><div className="header-actions"><button className="theme-button" type="button" onClick={() => setTheme(t => t === "dark" ? "light" : "dark")} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7" stroke="currentColor" strokeWidth="1.5" /><path d="M12 5a7 7 0 0 1 0 14Z" fill="currentColor" /></svg></button><button ref={menuButton} className="menu-button" onClick={() => setMenu(m => !m)} type="button" aria-label={menu ? "Close menu" : "Open menu"} aria-expanded={menu} aria-controls="primary-navigation"><span /><span /></button></div></div></header>
     <main id="main">
       <section className="hero" id="top" aria-labelledby="hero-title">
+        <HeroSignals />
         <div className="shell hero-inner">
           <div className="hero-content">
-            <div className="hero-mark" aria-hidden="true"><Image src="/assets/brand-symbol-transparent.png" alt="" width={180} height={180} priority /></div>
-            <h1 id="hero-title"><span>Understand your users.</span><span>Find where growth can come from.</span></h1>
+            <div className="hero-mark" aria-hidden="true"><span className="hero-mark-reveal"><span className="hero-mark-float"><Image src="/assets/brand-symbol-transparent.png" alt="" width={180} height={180} priority /></span></span><span className="hero-logo-scan" /></div>
+            <h1 id="hero-title" aria-label={headlineLines.join(" ")}>{headlineLines.map((line, lineIndex) => <span className="hero-line" aria-hidden="true" key={line}>{line.split(" ").map((word, wordIndex) => <span key={wordIndex}><span className="hero-word-clip"><span className="hero-word" style={{ "--word-delay": `${.08 + lineIndex * .08 + wordIndex * .018}s` } as CSSProperties}>{word}</span></span>{" "}</span>)}</span>)}</h1>
             <p className="hero-copy">User behaviour, market research and competitor intelligence for clearer business decisions.</p>
             <div className="hero-actions"><a className="primary-button hero-primary" href="#contact">Discuss a project</a><a className="hero-secondary" href="#services">Our services</a></div>
           </div>
