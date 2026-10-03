@@ -14,6 +14,8 @@ export default function LogoBackdrop() {
       const maximum = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       const progress = Math.max(0, Math.min(1, window.scrollY / maximum));
       const movement = reduced.matches ? 0 : progress;
+      const visibility = .35 + Math.min(1, window.scrollY / Math.max(1, window.innerHeight * .6)) * .65;
+      mark.current.style.setProperty("--logo-visibility", `${visibility}`);
       mark.current.style.setProperty("--logo-turn", `${-12 + movement * 40}deg`);
       mark.current.style.setProperty("--logo-x", `${Math.sin(movement * Math.PI * 2) * Math.min(window.innerWidth * .035, 48)}px`);
       mark.current.style.setProperty("--logo-y", `${(movement - .5) * 36}px`);
