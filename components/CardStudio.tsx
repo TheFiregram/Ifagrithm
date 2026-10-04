@@ -42,8 +42,8 @@ const SAMPLE: CardData = {
   bio: "Traces wallet cohorts and liquidity migration across L2s, turning raw onchain noise into signal.",
 };
 
-// demo photo lives in /public; production swaps this for the member's X photo
-const SAMPLE_AVATAR = null;
+// Examples belong in placeholders and the preview, never in visitor input.
+const EMPTY_CARD: CardData = { ...SAMPLE, name: "", tagline: "", bio: "" };
 
 function initialsOf(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -80,12 +80,18 @@ export default function CardStudio() {
   const { theme, toggleTheme } = useTheme();
   const searchParams = useSearchParams();
   const claimToken = searchParams.get("t");
-  const [data, setData] = useState<CardData>(SAMPLE);
-  const [avatar, setAvatar] = useState<string | null>(SAMPLE_AVATAR);
+  const [data, setData] = useState<CardData>(EMPTY_CARD);
+  const [avatar, setAvatar] = useState<string | null>(null);
   const [claim, setClaim] = useState<{ name: string; serial: string; token: string } | null>(null);
   const [claimState, setClaimState] = useState<"idle" | "loading" | "ok" | "invalid" | "unavailable">("idle");
   const [claimRetry, setClaimRetry] = useState(0);
   const verified = claimState === "ok" && claim?.token === claimToken;
+  const preview = verified ? data : {
+    ...data,
+    name: data.name || SAMPLE.name,
+    tagline: data.tagline || SAMPLE.tagline,
+    bio: data.bio || SAMPLE.bio,
+  };
   const [xHandle, setXHandle] = useState("");
   const [xStatus, setXStatus] = useState<"idle" | "loading" | "miss" | "error">("idle");
   const [exporting, setExporting] = useState(false);
@@ -144,7 +150,7 @@ export default function CardStudio() {
   // an approved member arrives via a claim link: /network?t=<token>
   useEffect(() => {
     avatarAbort.current?.abort();
-    setClaim(null); setAvatar(null); setData(SAMPLE); setXHandle(""); setXStatus("idle");
+    setClaim(null); setAvatar(null); setData(EMPTY_CARD); setXHandle(""); setXStatus("idle");
     setClaimState(claimToken ? "loading" : "idle");
     if (!/^[a-f0-9]{48}$/.test(claimToken ?? "")) {
       if (claimToken) setClaimState("invalid");
@@ -197,7 +203,7 @@ export default function CardStudio() {
     };
     fit(nameRef.current, 860, 118, 62);
     fit(taglineRef.current, 800, 26, 17);
-  }, [data.name, data.tagline, fontsTick]);
+  }, [preview.name, preview.tagline, fontsTick]);
 
   // scale the fixed 1080x1350 canvas into whatever space the shell has
   useEffect(() => {
@@ -327,7 +333,7 @@ export default function CardStudio() {
             <h3 className="ifg-legend"><span>01</span> Your profile</h3>
             <label className="ifg-field">
               <span className="studio-field-label">Full name {verified ? <span className="studio-fixed-label"><StudioIcon name="lock" /> Approved</span> : null}</span>
-              <input value={data.name} maxLength={120} readOnly={verified} disabled={exporting} onChange={(e) => set("name", e.target.value)} />
+              <input value={data.name} placeholder={SAMPLE.name} autoComplete="off" maxLength={120} readOnly={verified} disabled={exporting} onChange={(e) => set("name", e.target.value)} />
             </label>
             <div className="studio-photo-heading">
               <span className="studio-avatar-preview">
@@ -367,7 +373,8 @@ export default function CardStudio() {
               <span className="studio-field-label">Tagline <span className="studio-counter" aria-hidden="true">{data.tagline.length}/58</span></span>
               <input
                 value={data.tagline}
-                placeholder="A line about the work you do"
+                placeholder={SAMPLE.tagline}
+                autoComplete="off"
                 maxLength={58}
                 disabled={exporting}
                 onChange={(e) => set("tagline", e.target.value)}
@@ -377,7 +384,8 @@ export default function CardStudio() {
               <span className="studio-field-label">Bio <span className="studio-counter" aria-hidden="true">{data.bio.length}/132</span></span>
               <textarea
                 value={data.bio}
-                placeholder="A little about your work and the ideas you follow."
+                placeholder={SAMPLE.bio}
+                autoComplete="off"
                 maxLength={132}
                 disabled={exporting}
                 rows={4}
@@ -409,7 +417,7 @@ export default function CardStudio() {
             )}
             <p className="ifg-panel-foot">{verified ? "Your name, role and clearance come from your approved application." : "This is a sample card. Open your approval link to load your member details."}</p>
           </div>
-          {!verified ? <button type="button" className="ifg-btn ifg-btn-quiet" disabled={exporting} onClick={() => { avatarAbort.current?.abort(); setXStatus("idle"); setData(SAMPLE); setAvatar(SAMPLE_AVATAR); setXHandle(""); }}>Reset to sample</button> : null}
+          {!verified ? <button type="button" className="ifg-btn ifg-btn-quiet" disabled={exporting} onClick={() => { avatarAbort.current?.abort(); setXStatus("idle"); setData(EMPTY_CARD); setAvatar(null); setXHandle(""); }}>Clear fields</button> : null}
         </section>
 
         {/* ------- preview ------- */}
@@ -459,7 +467,7 @@ export default function CardStudio() {
                   <div className="ifg-monogram">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/assets/brand-symbol-transparent.png" alt="" aria-hidden="true" />
-                    <span>{initialsOf(data.name)}</span>
+                    <span>{initialsOf(preview.name)}</span>
                   </div>
                 )}
                 <span className="ifg-photo-chip">{data.desk}</span>
@@ -468,15 +476,15 @@ export default function CardStudio() {
 
               <div className="ifg-role" data-boot><span>{data.role}</span></div>
 
-              <h2 className="ifg-name" ref={nameRef} data-boot>{data.name}</h2>
-              <p className="ifg-tagline" ref={taglineRef} data-boot>{data.tagline.toUpperCase()}</p>
+              <h2 className="ifg-name" ref={nameRef} data-boot>{preview.name}</h2>
+              <p className="ifg-tagline" ref={taglineRef} data-boot>{preview.tagline.toUpperCase()}</p>
 
               <div className="ifg-tier" data-boot>
                 <i className="ifg-tier-gem" aria-hidden="true" />
                 <span>{data.tier}</span>
               </div>
 
-              <p className="ifg-bio" data-boot>{data.bio.toUpperCase()}</p>
+              <p className="ifg-bio" data-boot>{preview.bio.toUpperCase()}</p>
 
               <footer className="ifg-foot" data-boot>
                 <span className="ifg-foot-line" aria-hidden="true" />
