@@ -27,6 +27,8 @@ The counters describe the four research areas, three stages, and one decision be
 
 The enquiry form validates the required fields and opens the visitor's email app with a complete draft addressed to Ifagrithm@gmail.com. Visitors review and send the draft in their email app. The form keeps their answers and offers links to reopen the draft or compose it in Gmail. It does not claim delivery or depend on the network store. No enquiry is sent automatically.
 
+The member card studio at `/network` opens from an approved application's claim link. Approved names, roles, research desks and clearance tiers stay fixed; members can add their X photo, tagline and bio. The editor starts in light mode for new visitors and shares the site's saved theme preference. The glass header keeps its theme switch accessible. The responsive editor styles are separate from the card artwork, which keeps the same 1080 × 1350 PNG design in both themes. The public sample cannot be downloaded as an approved card.
+
 ## Verification
 
 Use Node 22.18 or newer (CI uses Node 24). Install both dependency sets before running the regression suite:

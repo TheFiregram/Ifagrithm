@@ -11,7 +11,10 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { toPng } from "html-to-image";
+import { BrandMark } from "./Brand";
+import { useTheme } from "./ThemeProvider";
 import "./network.css";
+import "./network-studio.css";
 
 const ROLES = ["RESEARCH SCOUT", "PARTNERSHIP", "RESEARCH ANALYST"] as const;
 const TIERS = ["BRONZE", "SILVER", "GOLD"] as const;
@@ -57,7 +60,24 @@ function readFileAsDataURL(file: Blob): Promise<string> {
   });
 }
 
+function StudioIcon({ name }: { name: "arrow" | "download" | "check" | "lock" | "edit" }) {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    {name === "arrow" ? <path d="M5 12h14m-6-6 6 6-6 6" /> : null}
+    {name === "download" ? <><path d="M12 3v12m-5-5 5 5 5-5" /><path d="M4 16v4h16v-4" /></> : null}
+    {name === "check" ? <path d="m5 12 4 4 10-10" /> : null}
+    {name === "lock" ? <><rect x="5" y="10" width="14" height="11" rx="3" /><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2" /></> : null}
+    {name === "edit" ? <><path d="m15 4 5 5M4 20l5-1L20 8a2.1 2.1 0 0 0-4-4L5 15l-1 5Z" /><path d="M13 20h7" /></> : null}
+  </svg>;
+}
+
+function displayLabel(value: string): string {
+  if (value === "DEFI") return "DeFi";
+  if (value === "RWA") return value;
+  return value.toLowerCase().replace(/\b\w/g, letter => letter.toUpperCase());
+}
+
 export default function CardStudio() {
+  const { theme, toggleTheme } = useTheme();
   const searchParams = useSearchParams();
   const claimToken = searchParams.get("t");
   const [data, setData] = useState<CardData>(SAMPLE);
@@ -265,137 +285,150 @@ export default function CardStudio() {
   }, [data.name, exporting, verified]);
 
   const xNote =
-    xStatus === "loading" ? "Resolving avatar…" :
-    xStatus === "miss" ? "No avatar on that handle." :
-    xStatus === "error" ? "That handle doesn't look right." : null;
+    xStatus === "loading" ? "Loading your photo…" :
+    xStatus === "miss" ? "No profile photo found. You can keep your initials." :
+    xStatus === "error" ? "Could not load this photo. Check the handle and try again." : null;
 
   return (
     <div className="ifg-studio">
       <header className="ifg-head">
-        <Link className="ifg-back" href="/">← ifagrithm.site</Link>
-        <div className="ifg-head-title">
-          <h1>Card Studio</h1>
-          <span className="ifg-head-chip">NETWORK · INTERNAL PREVIEW</span>
+        <div className="studio-header-inner">
+          <Link className="studio-brand" href="/" aria-label="IFAGRITHM home"><BrandMark /><span>IFAGRITHM</span></Link>
+          <span className="studio-header-label">Card Studio</span>
+          <div className="studio-header-actions">
+            <Link className="ifg-back" href="/"><StudioIcon name="arrow" /><span>Back to site</span></Link>
+            <button className="studio-theme-button" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} aria-pressed={theme === "dark"} title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7" stroke="currentColor" strokeWidth="1.5" /><path d="M12 5a7 7 0 0 1 0 14Z" fill="currentColor" /></svg>
+            </button>
+          </div>
         </div>
       </header>
+
+      <main className="studio-main">
+        <div className="studio-intro">
+          <div className="studio-intro-copy">
+            <p className="studio-eyebrow">RESEARCH NETWORK / MEMBER CARD</p>
+            <h1>Make it yours<span>.</span></h1>
+            <p>Your place in the network, ready to share. Add your photo and a few words about what you do.</p>
+          </div>
+          <ol className="studio-steps" aria-label="Create your member card">
+            <li data-complete={verified}><span>{verified ? <StudioIcon name="check" /> : "01"}</span><div><small>YOUR APPLICATION</small><strong>{verified ? "Approved" : "Approval"}</strong></div></li>
+            <li aria-current="step"><span>02</span><div><small>YOUR PERSPECTIVE</small><strong>Personalize</strong></div></li>
+            <li><span>03</span><div><small>YOUR NETWORK</small><strong>Download</strong></div></li>
+          </ol>
+        </div>
 
       <div className="ifg-grid">
         {/* ------- controls ------- */}
         <section className="ifg-panel" aria-label="Card details">
+          <div className="studio-panel-heading"><span className="studio-heading-icon"><StudioIcon name="edit" /></span><div><h2>Personalize your card</h2><p>Your changes appear in the preview.</p></div></div>
+
           <div className="ifg-fieldset">
-            <span className="ifg-legend">Identity</span>
+            <h3 className="ifg-legend"><span>01</span> Your profile</h3>
             <label className="ifg-field">
-              <span>Full name</span>
+              <span className="studio-field-label">Full name {verified ? <span className="studio-fixed-label"><StudioIcon name="lock" /> Approved</span> : null}</span>
               <input value={data.name} maxLength={120} readOnly={verified} disabled={exporting} onChange={(e) => set("name", e.target.value)} />
             </label>
+            <div className="studio-photo-heading">
+              <span className="studio-avatar-preview">
+                {avatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={avatar} alt="Your profile photo" />
+                ) : initialsOf(data.name)}
+              </span>
+              <div><strong>Profile photo</strong><p>Use your photo from X, or keep your initials.</p></div>
+            </div>
             <div className="ifg-field">
-              <span>Pull photo from X</span>
+              <label className="studio-field-label" htmlFor="studio-x-handle">X handle</label>
               <div className="ifg-inline">
                 <input
+                  id="studio-x-handle"
                   value={xHandle}
                   placeholder="@handle"
                   maxLength={16}
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
                   disabled={exporting}
                   onChange={(e) => { avatarAbort.current?.abort(); setXHandle(e.target.value); setXStatus("idle"); }}
                   onKeyDown={(e) => { if (e.key === "Enter" && !exporting) void fetchAvatar(xHandle); }}
                 />
-                <button type="button" className="ifg-btn" onClick={() => void fetchAvatar(xHandle)} disabled={xStatus === "loading" || exporting}>
-                  Fetch
+                <button type="button" className="ifg-btn" onClick={() => void fetchAvatar(xHandle)} disabled={xStatus === "loading" || exporting || !xHandle.trim()}>
+                  {xStatus === "loading" ? "Loading…" : "Use photo"}
                 </button>
               </div>
-              {xNote ? <em className="ifg-note">{xNote}</em> : null}
+              {xNote ? <p className="ifg-note" role="status">{xNote}</p> : null}
             </div>
           </div>
 
           <div className="ifg-fieldset">
-            <span className="ifg-legend">Role</span>
-            <div className="ifg-seg" role="radiogroup" aria-label="Role">
-              {ROLES.map((role) => (
-                <button
-                  key={role}
-                  type="button"
-                  role="radio"
-                  aria-checked={data.role === role}
-                  className={data.role === role ? "on" : ""}
-                  disabled={verified || exporting} onClick={() => set("role", role)}
-                >
-                  {role}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="ifg-fieldset">
-            <span className="ifg-legend">Clearance</span>
-            <p className="ifg-hint">
-              {verified
-                ? "Set by your approval mail — the card wears its colour."
-                : "Sample only. Members receive theirs with the approval."}
-            </p>
-            <div className="ifg-seg" role="radiogroup" aria-label="Clearance tier">
-              {TIERS.map((tier) => (
-                <button
-                  key={tier}
-                  type="button"
-                  role="radio"
-                  aria-checked={data.tier === tier}
-                  data-tier={tier.toLowerCase()}
-                  className={data.tier === tier ? "on" : ""}
-                  disabled={verified || exporting} onClick={() => set("tier", tier)}
-                >
-                  <i aria-hidden /> {tier}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="ifg-fieldset">
-            <span className="ifg-legend">Presentation</span>
+            <h3 className="ifg-legend"><span>02</span> Your perspective</h3>
             <label className="ifg-field">
-              <span>Tagline</span>
+              <span className="studio-field-label">Tagline <span className="studio-counter" aria-hidden="true">{data.tagline.length}/58</span></span>
               <input
                 value={data.tagline}
+                placeholder="A line about the work you do"
                 maxLength={58}
                 disabled={exporting}
                 onChange={(e) => set("tagline", e.target.value)}
               />
             </label>
             <label className="ifg-field">
-              <span>Bio <em>· {data.bio.length}/132 — three lines on the card</em></span>
+              <span className="studio-field-label">Bio <span className="studio-counter" aria-hidden="true">{data.bio.length}/132</span></span>
               <textarea
                 value={data.bio}
+                placeholder="A little about your work and the ideas you follow."
                 maxLength={132}
                 disabled={exporting}
                 rows={4}
                 onChange={(e) => set("bio", e.target.value)}
               />
             </label>
+            <p className="studio-field-help">Keep it short. Your bio has space for three lines on the card.</p>
           </div>
 
-          <button type="button" className="ifg-btn ifg-btn-quiet" disabled={verified || exporting} onClick={() => { avatarAbort.current?.abort(); setXStatus("idle"); setData(SAMPLE); setAvatar(SAMPLE_AVATAR); setXHandle(""); }}>
-            Reset to sample
-          </button>
-          <p className="ifg-panel-foot">
-            {verified && claim
-              ? `Verified member ${claim.serial}. Your details came from the approval — add your photo and make it yours.`
-              : "Preview only. Open your approval link to download your official card."}
-          </p>
+          <div className="ifg-fieldset studio-member-details">
+            <h3 className="ifg-legend"><span>03</span> Your membership {verified ? <StudioIcon name="lock" /> : null}</h3>
+            {verified ? (
+              <dl className="studio-membership-grid">
+                <div><dt>Role</dt><dd>{displayLabel(data.role)}</dd></div>
+                <div><dt>Clearance</dt><dd><i className="studio-tier-dot" data-tier={data.tier.toLowerCase()} aria-hidden="true" />{displayLabel(data.tier)}</dd></div>
+                <div className="studio-desk"><dt>Research desk</dt><dd>{displayLabel(data.desk)}</dd></div>
+              </dl>
+            ) : (
+              <>
+                <span className="studio-field-label" id="studio-role-label">Role</span>
+                <div className="ifg-seg" role="radiogroup" aria-labelledby="studio-role-label">
+                  {ROLES.map(role => <button key={role} type="button" role="radio" aria-checked={data.role === role} className={data.role === role ? "on" : ""} disabled={exporting} onClick={() => set("role", role)}>{displayLabel(role)}</button>)}
+                </div>
+                <span className="studio-field-label" id="studio-tier-label">Clearance tier</span>
+                <div className="ifg-seg" role="radiogroup" aria-labelledby="studio-tier-label">
+                  {TIERS.map(tier => <button key={tier} type="button" role="radio" aria-checked={data.tier === tier} data-tier={tier.toLowerCase()} className={data.tier === tier ? "on" : ""} disabled={exporting} onClick={() => set("tier", tier)}><i aria-hidden="true" />{displayLabel(tier)}</button>)}
+                </div>
+              </>
+            )}
+            <p className="ifg-panel-foot">{verified ? "Your name, role and clearance come from your approved application." : "This is a sample card. Open your approval link to load your member details."}</p>
+          </div>
+          {!verified ? <button type="button" className="ifg-btn ifg-btn-quiet" disabled={exporting} onClick={() => { avatarAbort.current?.abort(); setXStatus("idle"); setData(SAMPLE); setAvatar(SAMPLE_AVATAR); setXHandle(""); }}>Reset to sample</button> : null}
         </section>
 
         {/* ------- preview ------- */}
         <section className="ifg-stage" aria-label="Card preview">
+          <div className="studio-preview-heading"><div><span className="studio-eyebrow">THE FINISHED LOOK</span><h2>Live preview</h2></div><span className="studio-format">1080 × 1350</span></div>
           {verified && claim ? (
             <div className="ifg-claim-banner" role="status">
-              VERIFIED · {claim.serial} — your details are loaded. Add your photo, make it yours, download.
+              <StudioIcon name="check" /><span>VERIFIED · {claim.serial}</span><span className="studio-verified-note">Your details are loaded.</span>
             </div>
           ) : null}
           {claimState === "invalid" ? (
             <div className="ifg-claim-banner bad" role="alert">
-              This claim link isn&apos;t valid — ask for a fresh approval mail.
+              This claim link isn&apos;t valid. Open the link from your approval email.
             </div>
           ) : null}
           {claimState === "loading" ? <p className="ifg-claim-banner" role="status">Loading your member details…</p> : null}
           {claimState === "unavailable" ? <div className="ifg-claim-banner bad" role="alert">We could not load your member details. Check your connection and try again. <button type="button" className="ifg-btn" onClick={() => setClaimRetry(value => value + 1)}>Try again</button></div> : null}
+          {!claimToken ? <div className="ifg-claim-banner studio-preview-notice" role="status"><span>Preview mode. Members arrive here after approval.</span><Link href="/application">Join the network <StudioIcon name="arrow" /></Link></div> : null}
+          <div className="studio-preview-mat">
           <div className="ifg-card-shell" ref={shellRef}>
             <div
               ref={cardRef}
@@ -455,6 +488,7 @@ export default function CardStudio() {
               </footer>
             </div>
           </div>
+          </div>
 
           <div className="ifg-stage-bar">
             <button
@@ -463,14 +497,15 @@ export default function CardStudio() {
               onClick={download}
               disabled={exporting || !verified || xStatus === "loading"}
             >
+              <StudioIcon name="download" />
               {exporting ? "Rendering…" : "Download card · PNG"}
             </button>
-            <span className="ifg-stage-hint">
-              {exportNote ? <em className="ifg-note">{exportNote}</em> : <>Exports at 1080 × 1350 — sized for X posts.</>}
-            </span>
+            <p className="ifg-stage-hint" role="status">{exportNote || (verified ? "A high resolution PNG, ready to share." : "Use your approval link to download your member card.")}</p>
           </div>
         </section>
       </div>
+      <footer className="studio-footer"><span>IFAGRITHM Research Network</span><Link href="/">Back to IFAGRITHM <StudioIcon name="arrow" /></Link></footer>
+      </main>
     </div>
   );
 }
