@@ -1,6 +1,6 @@
 # Research network integration
 
-The homepage, application form, admin console and approved card studio share the current site design.
+The homepage, application form, admin console and approved card studio share the current site design. The homepage enquiry form prepares an email draft for visitors to send from their email app or Gmail; it requires no server email configuration and does not call the enquiry storage API. The network application and admin workflows still use the backend described here.
 
 ## Connect Vercel
 Set these server environment variables in the Ifagrithm project:
@@ -20,4 +20,4 @@ Use remote/db-setup.sh only for a fresh server/database. Scripts have not been e
 Basic per process limits are included. Add persistent rate limiting at nginx or an API gateway for applications and admin login. The shared admin password grants all administrative actions; use individual accounts if multiple reviewers join. Claim links are reusable bearer links: keep them private. The card is a downloadable image, not a cryptographic credential. Card identity and tier controls are fixed after approval; the PNG is not independent proof of membership.
 
 ## Validation
-Local tests use a disposable mock store, not the production database, and do not send real email. Configure the live backend, then check a controlled application, admin decision, email delivery and card download before opening recruitment. Application and enquiry forms show an honest failure state with email/copy fallback when storage is unavailable.
+Local tests use a disposable mock store, not the production database, and do not send real email. Configure the live backend, then check a controlled application, admin decision, email delivery and card download before opening recruitment. The application form shows an honest failure state with an email/copy fallback when storage is unavailable. The homepage enquiry form keeps entered fields after preparing a draft and states that visitors must press Send in their email app.
