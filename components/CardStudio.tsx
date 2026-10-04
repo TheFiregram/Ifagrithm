@@ -62,8 +62,10 @@ export default function CardStudio() {
   const claimToken = searchParams.get("t");
   const [data, setData] = useState<CardData>(SAMPLE);
   const [avatar, setAvatar] = useState<string | null>(SAMPLE_AVATAR);
-  const [claim, setClaim] = useState<{ name: string; serial: string } | null>(null);
-  const [claimState, setClaimState] = useState<"idle" | "ok" | "invalid">("idle");
+  const [claim, setClaim] = useState<{ name: string; serial: string; token: string } | null>(null);
+  const [claimState, setClaimState] = useState<"idle" | "loading" | "ok" | "invalid" | "unavailable">("idle");
+  const [claimRetry, setClaimRetry] = useState(0);
+  const verified = claimState === "ok" && claim?.token === claimToken;
   const [xHandle, setXHandle] = useState("");
   const [xStatus, setXStatus] = useState<"idle" | "loading" | "miss" | "error">("idle");
   const [exporting, setExporting] = useState(false);
@@ -75,6 +77,7 @@ export default function CardStudio() {
   const shellRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLHeadingElement>(null);
   const taglineRef = useRef<HTMLParagraphElement>(null);
+  const avatarAbort = useRef<AbortController | null>(null);
 
   const set = <K extends keyof CardData>(key: K, value: CardData[K]) =>
     setData((d) => ({ ...d, [key]: value }));
@@ -93,39 +96,54 @@ export default function CardStudio() {
   }, []);
 
   const fetchAvatar = useCallback(async (handle: string) => {
+    avatarAbort.current?.abort();
     const clean = handle.trim().replace(/^@/, "");
     if (!/^[A-Za-z0-9_]{1,15}$/.test(clean)) {
       setXStatus("error");
       return false;
     }
     setXStatus("loading");
+    const controller = new AbortController();
+    avatarAbort.current = controller;
     try {
-      const res = await fetch(`/api/avatar?handle=${encodeURIComponent(clean)}`);
+      const res = await fetch(`/api/avatar?handle=${encodeURIComponent(clean)}`, { signal: AbortSignal.any([controller.signal, AbortSignal.timeout(10000)]) });
       if (!res.ok) throw new Error(res.status === 404 ? "miss" : "error");
-      setAvatar(await readFileAsDataURL(await res.blob()));
+      const image = await readFileAsDataURL(await res.blob());
+      if (controller.signal.aborted) return false;
+      setAvatar(image);
       setXStatus("idle");
       return true;
     } catch (err) {
+      if (controller.signal.aborted) return false;
       setXStatus(err instanceof Error && err.message === "miss" ? "miss" : "error");
       return false;
     }
   }, []);
+  useEffect(() => () => { avatarAbort.current?.abort(); }, []);
 
   // an approved member arrives via a claim link: /network?t=<token>
   useEffect(() => {
+    avatarAbort.current?.abort();
+    setClaim(null); setAvatar(null); setData(SAMPLE); setXHandle(""); setXStatus("idle");
+    setClaimState(claimToken ? "loading" : "idle");
     if (!/^[a-f0-9]{48}$/.test(claimToken ?? "")) {
       if (claimToken) setClaimState("invalid");
       return;
     }
     let alive = true;
+    const controller = new AbortController();
     (async () => {
       try {
-        const res = await fetch(`/api/claim?t=${claimToken}`);
-        if (!res.ok) throw new Error();
+        const res = await fetch(`/api/claim?t=${claimToken}`, { cache: "no-store", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(30000)]) });
+        if (!res.ok) {
+          if (alive) setClaimState(res.status === 400 || res.status === 404 ? "invalid" : "unavailable");
+          return;
+        }
         const info = await res.json();
         if (!alive) return;
         const desk = DESK_LABELS.find(d => d === String(info.desk ?? "").toUpperCase());
         const tier = TIERS.find(t => t === String(info.tier ?? "").toUpperCase());
+        if (typeof info.name !== "string" || typeof info.serial !== "string" || !desk || !tier || !(ROLES as readonly string[]).includes(info.role)) throw new Error("Invalid claim response.");
         setData(d => ({
           ...d,
           name: info.name || d.name,
@@ -136,15 +154,15 @@ export default function CardStudio() {
         }));
         setXHandle(info.x_handle ?? "");
         setAvatar(null); // their card, their photo — fetched next line
-        setClaim({ name: info.name ?? "", serial: info.serial ?? "" });
+        setClaim({ name: info.name, serial: info.serial, token: claimToken! });
         setClaimState("ok");
         if (info.x_handle) void fetchAvatar(String(info.x_handle));
       } catch {
-        if (alive) setClaimState("invalid");
+        if (alive) setClaimState("unavailable");
       }
     })();
-    return () => { alive = false; };
-  }, [claimToken, fetchAvatar]);
+    return () => { alive = false; controller.abort(); avatarAbort.current?.abort(); };
+  }, [claimToken, claimRetry, fetchAvatar]);
 
   // long names/taglines shrink to fit the card instead of overflowing
   useLayoutEffect(() => {
@@ -200,7 +218,7 @@ export default function CardStudio() {
 
   const download = useCallback(async () => {
     const node = cardRef.current;
-    if (!node || exporting || claimState !== "ok") return;
+    if (!node || exporting || !verified) return;
     setExporting(true);
     setExportNote(null);
     node.classList.add("is-export");
@@ -220,18 +238,22 @@ export default function CardStudio() {
       await toPng(node, options);
       const url = await toPng(node, options);
       const blob = await (await fetch(url)).blob();
-      const file = new File([blob], `IFAGRITHM-${data.name.trim().replace(/\s+/g, "-") || "card"}.png`, { type: "image/png" });
+      const file = new File([blob], `IFAGRITHM-${data.name.trim().replace(/[^\p{L}\p{N}._-]+/gu, "-").slice(0, 80) || "card"}.png`, { type: "image/png" });
       const nav = navigator as Navigator & { canShare?: (data: { files?: File[] }) => boolean };
       // iOS Safari ignores the download attribute — hand it to the share
       // sheet (Save Image), falling back to opening it in a new tab
-      if (nav.canShare?.({ files: [file] })) {
-        await nav.share!({ files: [file], title: "IFAGRITHM network card" });
-      } else {
+      let shared = false;
+      if (nav.canShare?.({ files: [file] }) && nav.share) {
+        try { await nav.share({ files: [file], title: "IFAGRITHM network card" }); shared = true; }
+        catch (error) { if (error instanceof DOMException && error.name === "AbortError") throw error; }
+      }
+      if (!shared) {
         const link = document.createElement("a");
         link.download = file.name;
-        link.href = URL.createObjectURL(blob);
-        link.click();
-        setTimeout(() => URL.revokeObjectURL(link.href), 4000);
+        const objectUrl = URL.createObjectURL(blob);
+        link.href = objectUrl;
+        document.body.appendChild(link); link.click(); link.remove();
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 4000);
       }
     } catch (err) {
       const aborted = err instanceof DOMException && err.name === "AbortError";
@@ -240,7 +262,7 @@ export default function CardStudio() {
       node.classList.remove("is-export");
       setExporting(false);
     }
-  }, [data.name, exporting, claimState]);
+  }, [data.name, exporting, verified]);
 
   const xNote =
     xStatus === "loading" ? "Resolving avatar…" :
@@ -264,7 +286,7 @@ export default function CardStudio() {
             <span className="ifg-legend">Identity</span>
             <label className="ifg-field">
               <span>Full name</span>
-              <input value={data.name} maxLength={28} readOnly={claimState === "ok"} onChange={(e) => set("name", e.target.value)} />
+              <input value={data.name} maxLength={120} readOnly={verified} disabled={exporting} onChange={(e) => set("name", e.target.value)} />
             </label>
             <div className="ifg-field">
               <span>Pull photo from X</span>
@@ -273,10 +295,11 @@ export default function CardStudio() {
                   value={xHandle}
                   placeholder="@handle"
                   maxLength={16}
-                  onChange={(e) => { setXHandle(e.target.value); setXStatus("idle"); }}
-                  onKeyDown={(e) => { if (e.key === "Enter") void fetchAvatar(xHandle); }}
+                  disabled={exporting}
+                  onChange={(e) => { avatarAbort.current?.abort(); setXHandle(e.target.value); setXStatus("idle"); }}
+                  onKeyDown={(e) => { if (e.key === "Enter" && !exporting) void fetchAvatar(xHandle); }}
                 />
-                <button type="button" className="ifg-btn" onClick={() => void fetchAvatar(xHandle)} disabled={xStatus === "loading"}>
+                <button type="button" className="ifg-btn" onClick={() => void fetchAvatar(xHandle)} disabled={xStatus === "loading" || exporting}>
                   Fetch
                 </button>
               </div>
@@ -294,7 +317,7 @@ export default function CardStudio() {
                   role="radio"
                   aria-checked={data.role === role}
                   className={data.role === role ? "on" : ""}
-                  disabled={claimState === "ok"} onClick={() => set("role", role)}
+                  disabled={verified || exporting} onClick={() => set("role", role)}
                 >
                   {role}
                 </button>
@@ -305,7 +328,7 @@ export default function CardStudio() {
           <div className="ifg-fieldset">
             <span className="ifg-legend">Clearance</span>
             <p className="ifg-hint">
-              {claimState === "ok"
+              {verified
                 ? "Set by your approval mail — the card wears its colour."
                 : "Sample only. Members receive theirs with the approval."}
             </p>
@@ -318,7 +341,7 @@ export default function CardStudio() {
                   aria-checked={data.tier === tier}
                   data-tier={tier.toLowerCase()}
                   className={data.tier === tier ? "on" : ""}
-                  disabled={claimState === "ok"} onClick={() => set("tier", tier)}
+                  disabled={verified || exporting} onClick={() => set("tier", tier)}
                 >
                   <i aria-hidden /> {tier}
                 </button>
@@ -333,6 +356,7 @@ export default function CardStudio() {
               <input
                 value={data.tagline}
                 maxLength={58}
+                disabled={exporting}
                 onChange={(e) => set("tagline", e.target.value)}
               />
             </label>
@@ -341,17 +365,18 @@ export default function CardStudio() {
               <textarea
                 value={data.bio}
                 maxLength={132}
+                disabled={exporting}
                 rows={4}
                 onChange={(e) => set("bio", e.target.value)}
               />
             </label>
           </div>
 
-          <button type="button" className="ifg-btn ifg-btn-quiet" disabled={claimState === "ok"} onClick={() => { setData(SAMPLE); setAvatar(SAMPLE_AVATAR); setXHandle(""); }}>
+          <button type="button" className="ifg-btn ifg-btn-quiet" disabled={verified || exporting} onClick={() => { avatarAbort.current?.abort(); setXStatus("idle"); setData(SAMPLE); setAvatar(SAMPLE_AVATAR); setXHandle(""); }}>
             Reset to sample
           </button>
           <p className="ifg-panel-foot">
-            {claimState === "ok" && claim
+            {verified && claim
               ? `Verified member ${claim.serial}. Your details came from the approval — add your photo and make it yours.`
               : "Preview only. Open your approval link to download your official card."}
           </p>
@@ -359,7 +384,7 @@ export default function CardStudio() {
 
         {/* ------- preview ------- */}
         <section className="ifg-stage" aria-label="Card preview">
-          {claimState === "ok" && claim ? (
+          {verified && claim ? (
             <div className="ifg-claim-banner" role="status">
               VERIFIED · {claim.serial} — your details are loaded. Add your photo, make it yours, download.
             </div>
@@ -369,6 +394,8 @@ export default function CardStudio() {
               This claim link isn&apos;t valid — ask for a fresh approval mail.
             </div>
           ) : null}
+          {claimState === "loading" ? <p className="ifg-claim-banner" role="status">Loading your member details…</p> : null}
+          {claimState === "unavailable" ? <div className="ifg-claim-banner bad" role="alert">We could not load your member details. Check your connection and try again. <button type="button" className="ifg-btn" onClick={() => setClaimRetry(value => value + 1)}>Try again</button></div> : null}
           <div className="ifg-card-shell" ref={shellRef}>
             <div
               ref={cardRef}
@@ -388,7 +415,7 @@ export default function CardStudio() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <span className="ifg-badge-logo"><img src="/assets/brand-symbol-transparent.png" alt="" /></span>
                 <span className="ifg-badge-name">IFAGRITHM</span>
-                <span className="ifg-badge-sub">RESEARCH&nbsp;NETWORK</span>{claim && <span className="ifg-card-serial">{claim.serial}</span>}
+                <span className="ifg-badge-sub">RESEARCH&nbsp;NETWORK</span>{verified && claim && <span className="ifg-card-serial">{claim.serial}</span>}
               </header>
 
               <figure className="ifg-photo" data-boot>
@@ -434,7 +461,7 @@ export default function CardStudio() {
               type="button"
               className="ifg-btn ifg-btn-gold"
               onClick={download}
-              disabled={exporting || claimState !== "ok"}
+              disabled={exporting || !verified || xStatus === "loading"}
             >
               {exporting ? "Rendering…" : "Download card · PNG"}
             </button>

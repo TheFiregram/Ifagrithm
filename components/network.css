@@ -727,5 +727,7 @@
 .ifg-field input,.ifg-field textarea{width:100%;min-width:0}
 .ifg-btn-gold{background:#ffc425;border-color:#ffc425}
 .ifg-card-shell{max-width:min(480px,100%);overflow:clip}
+.ifg-name,.ifg-tagline{overflow:hidden;text-overflow:ellipsis}
+.ifg-bio{overflow-wrap:anywhere}
 html[data-theme=light] .ifg-seg button.on[data-tier="silver"]{color:#505966;background:rgba(80,89,102,.08)}
 @media(max-width:560px){.ifg-panel{padding:22px 16px}.ifg-seg button{font-size:10px;letter-spacing:0;gap:5px}.ifg-inline{flex-wrap:wrap}.ifg-inline input{flex-basis:100%}.ifg-head-chip{letter-spacing:.12em}}

@@ -26,3 +26,20 @@ Feature panels support wheel gestures, touch swipes, and keyboard navigation. Sh
 The counters describe the four research areas, three stages, and one decision being studied. Research cards illustrate possible outputs; they are not customer results or testimonials.
 
 The enquiry form validates the required fields and opens the visitor's email app with a complete draft addressed to Ifagrithm@gmail.com. Visitors review and send the draft in their email app. The form keeps their answers and offers links to reopen the draft or compose it in Gmail. It does not claim delivery or depend on the network store. No enquiry is sent automatically.
+
+## Verification
+
+Use Node 22.18 or newer (CI uses Node 24). Install both dependency sets before running the regression suite:
+
+```sh
+npm ci
+npm ci --prefix remote
+npm test
+npm run lint
+npm run typecheck
+npm run build
+npm audit --omit=dev
+npm audit --prefix remote
+```
+
+The suite uses disposable local PostgreSQL data via PGlite. It sends no real email and does not touch production records. GitHub runs these checks on pull requests and changes to main. The application and enquiry APIs validate JSON types, field lengths and request sizes; private API responses cannot be cached. Avatar downloads accept verified raster image types from approved hosts and reject SVG, unsafe redirects and oversized responses. The admin password must contain at least 16 characters. See SECURITY_REVIEW.md for findings, evidence and deployment limits.
