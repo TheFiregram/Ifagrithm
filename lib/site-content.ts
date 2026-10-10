@@ -1,0 +1,36 @@
+export const companyDescriptor = "Web3 Research & Business Services";
+export const pageTitle = `IFAGRITHM | ${companyDescriptor}`;
+export const pageDescription = "IFAGRITHM partners with Web3 teams on competitor intelligence, user behaviour research, ecosystem studies, data analytics and scoped business services.";
+export const heroHeadline = "Research and business support for Web3 teams.";
+export const heroCopy = "IFAGRITHM partners with founders and teams to understand markets, competitors and users, analyse business activity, and work through defined business challenges with specialist research and support.";
+
+export const capabilities = [
+  {tab:"Research & Intelligence", label:"01 / CORE CAPABILITY", lines:["Research &", "Intelligence"], description:"Investigate markets, competitors, users, ecosystems and emerging commercial opportunities. From focused competitor studies to behavioural and custom research."},
+  {tab:"Data & Analytics", label:"02 / CORE CAPABILITY", lines:["Data &", "Analytics"], description:"Make sense of product, campaign and business activity. Define meaningful measures, examine outcomes and translate findings into practical next steps."},
+  {tab:"Growth & Partnerships", label:"03 / SELECTED ASSIGNMENTS", lines:["Growth &", "Partnerships"], description:"Explore targeted distribution, creator, community and partnership assignments where there is a clear brief and suitable delivery capacity."},
+  {tab:"Custom Business Engagements", label:"04 / SCOPED TO YOUR NEED", lines:["Custom Business", "Engagements"], description:"Have a different business challenge? Tell us the outcome you need. We will assess the scope, required expertise and whether we can help directly or with a specialist partner."},
+];
+
+export const stages = [
+  {title:"Understand",label:"UNDERSTAND",text:"Tell us what you are building, what has changed and which business question matters now.",nodes:["P","Q","N"]},
+  {title:"Define",label:"DEFINE",text:"We agree on the outcome, scope, evidence needed, delivery method and commercial terms.",nodes:["O","S","E"]},
+  {title:"Deliver",label:"DELIVER",text:"We conduct the research or agreed specialist work, directly or with suitable delivery partners where applicable.",nodes:["R","D","P"]},
+  {title:"Review",label:"REVIEW",text:"We explain findings, limitations and recommended next steps. Any follow-on work is scoped separately.",nodes:["F","L","N"]},
+];
+
+export const sectors = [
+  {title:"Consumer Apps",copy:"User-facing products that need customer insight, competitor research, performance analysis or specialised support."},
+  {title:"Token & Memecoin Ecosystem",copy:"Businesses building tools, communities and services around token-market activity. Research focuses on participants, products, behaviours and commercial needs."},
+  {title:"RWA, Stablecoins & Payments",copy:"Customer-facing financial and asset-related businesses assessing market demand, user behaviour, distribution and product opportunities."},
+  {title:"Protocols & Infrastructure",copy:"Selected assignments in market intelligence, user or ecosystem research where the scope fits our capabilities."},
+];
+
+export const questions = [
+  {question:"What exactly is IFAGRITHM?",answer:"IFAGRITHM is a Web3 research and business services company. We work with teams on research, data intelligence and selected specialist business challenges."},
+  {question:"Are you a research firm or a marketing agency?",answer:"Research and business intelligence are our core. We may scope growth, distribution or partnership assignments where the fit and delivery capacity are clear."},
+  {question:"What services can we request?",answer:"Common starting points include competitor research, user behaviour studies, ecosystem intelligence, commercial opportunity assessments and performance analysis. We consider custom requests."},
+  {question:"Can we bring a problem that is not listed?",answer:"Yes. Describe the business problem, desired outcome and constraints. We will assess whether it fits our work or requires another specialist."},
+  {question:"Which Web3 teams do you work with?",answer:"Our work can be relevant to consumer apps, token-ecosystem businesses, RWA and payment products, and selected protocol teams. Suitability is decided project by project."},
+  {question:"How do projects begin?",answer:"We clarify the question, scope, inputs, responsibilities, timing and price before accepting work."},
+  {question:"Do you guarantee users, funding or revenue?",answer:"No. We agree on specific deliverables and explain the limits of any research or execution assignment."},
+];

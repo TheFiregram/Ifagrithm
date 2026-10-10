@@ -1,20 +1,22 @@
 export const ENQUIRY_EMAIL = "Ifagrithm@gmail.com";
-export const ENQUIRY_SUBJECT = "IFAGRITHM growth enquiry";
+export const ENQUIRY_SUBJECT = "IFAGRITHM project enquiry";
 
 export type Enquiry = {
   name: string;
   email: string;
   company: string;
   question: string;
+  timeline?: string;
 };
 
 export function enquiryMessage(enquiry: Enquiry): string {
   return [
     `Name: ${enquiry.name.trim()}`,
     `Email: ${enquiry.email.trim()}`,
-    `Company: ${enquiry.company.trim() || "Not provided"}`,
+    `Company / Project: ${enquiry.company.trim() || "Not provided"}`,
+    `Timeline: ${enquiry.timeline?.trim() || "Not provided"}`,
     "",
-    "Growth challenge:",
+    "Business challenge:",
     enquiry.question.trim(),
   ].join("\r\n");
 }

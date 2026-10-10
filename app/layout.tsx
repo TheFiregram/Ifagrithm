@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import ThemeProvider from "../components/ThemeProvider";
 import { DEFAULT_THEME, themeBootstrapScript } from "../lib/theme";
 import "./globals.css";
-
-const title = "IFAGRITHM | Web3 Research & Intelligence";
-const description = "User behaviour, market research and competitor intelligence for Web3 teams making product and growth decisions.";
+import { pageTitle as title, pageDescription as description } from "../lib/site-content";
 
 export const metadata: Metadata = {
   metadataBase: new URL(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL || "ifagrithm-seven.vercel.app"}`),

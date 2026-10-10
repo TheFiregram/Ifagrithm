@@ -1,8 +1,9 @@
 "use client";
 
 import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { heroHeadline } from "../lib/site-content";
 
-const words = ["Users", "Market", "Growth", "Next Move"];
+const words = ["users", "markets", "business", "next move"];
 
 export default function RotatingHeadline({ running }: { running: boolean }) {
   const [word, setWord] = useState(0);
@@ -47,5 +48,5 @@ export default function RotatingHeadline({ running }: { running: boolean }) {
     return () => { active = false; clearTimeout(timer); media.removeEventListener("change",changed); };
   }, [running]);
 
-  return <h1 className="hero-headline hero-enter" aria-label="Understand Your Users. Make Better Growth Decisions."><span aria-hidden="true">Understand Your </span><span className="rotating-word" ref={holder} aria-hidden="true" style={{ "--word-length": words[word].length } as CSSProperties}><span className="word-measures">{words.map(sample=><span data-word-measure key={sample}>{sample}.</span>)}</span><span key={word} className={`rotating-letters${leaving ? " is-leaving" : ""}`}>{[...`${words[word]}.`].map((letter, index) => <span key={index} style={{ "--letter": index, "--reverse-letter": words[word].length - index } as CSSProperties}>{letter === " " ? "\u00a0" : letter}</span>)}</span><span className="word-track"><span key={`sweep-${word}`} /></span></span><span className="hero-growth-line">Make Better Growth Decisions.</span></h1>;
+  return <><h1 className="hero-headline hero-enter">{heroHeadline}</h1><div className="hero-rotating hero-enter" aria-hidden="true"><span>Evidence for your </span><span className="rotating-word" ref={holder} aria-hidden="true" style={{ "--word-length": words[word].length } as CSSProperties}><span className="word-measures">{words.map(sample=><span data-word-measure key={sample}>{sample}.</span>)}</span><span key={word} className={`rotating-letters${leaving ? " is-leaving" : ""}`}>{[...`${words[word]}.`].map((letter, index) => <span key={index} style={{ "--letter": index, "--reverse-letter": words[word].length - index } as CSSProperties}>{letter === " " ? "\u00a0" : letter}</span>)}</span><span className="word-track"><span key={`sweep-${word}`} /></span></span></div></>;
 }

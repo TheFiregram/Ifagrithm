@@ -4,7 +4,7 @@ import { type FormEvent, useState } from "react";
 import { Arrow } from "./Brand";
 import { ENQUIRY_EMAIL, enquiryEmailUrl, enquiryGmailUrl, type Enquiry } from "../lib/enquiry";
 
-const emptyEnquiry: Enquiry = { name: "", email: "", company: "", question: "" };
+const emptyEnquiry: Enquiry = { name: "", email: "", company: "", question: "", timeline: "" };
 
 export default function EnquiryForm() {
   const [brief, setBrief] = useState<Enquiry>(emptyEnquiry);
@@ -21,11 +21,11 @@ export default function EnquiryForm() {
     event.preventDefault();
     if (!event.currentTarget.reportValidity()) return;
     if (!brief.name.trim() || !brief.question.trim()) {
-      setStatus("Complete your name and growth challenge.");
+      setStatus("Complete your name and business challenge.");
       return;
     }
 
-    const enquiry = { name: brief.name.trim(), email: brief.email.trim(), company: brief.company.trim(), question: brief.question.trim() };
+    const enquiry = { name: brief.name.trim(), email: brief.email.trim(), company: brief.company.trim(), question: brief.question.trim(), timeline: brief.timeline?.trim() };
     setPrepared(enquiry);
     setStatus("Your email draft is ready. Review it and press Send in your email app. If it did not open, use an option below.");
     window.location.href = enquiryEmailUrl(enquiry);
@@ -36,9 +36,10 @@ export default function EnquiryForm() {
       <label htmlFor="brief-name">Name<input id="brief-name" name="name" autoComplete="name" required maxLength={200} placeholder="Your name" value={brief.name} onChange={event => update("name", event.target.value)} /></label>
       <label htmlFor="brief-email">Work email<input id="brief-email" name="email" type="email" autoComplete="email" required maxLength={254} placeholder="you@company.com" value={brief.email} onChange={event => update("email", event.target.value)} /></label>
     </div>
-    <label htmlFor="brief-company">Company <span className="optional">(optional)</span><input id="brief-company" name="company" autoComplete="organization" maxLength={200} placeholder="Your team or product" value={brief.company} onChange={event => update("company", event.target.value)} /></label>
-    <label htmlFor="brief-question">What growth challenges would you like to discuss?<textarea id="brief-question" name="question" required maxLength={4000} rows={3} placeholder="Tell us about your product, users, growth spending or partnership needs…" value={brief.question} onChange={event => update("question", event.target.value)} /></label>
-    <button className="button button-primary" type="submit">Open email draft <Arrow /></button>
+    <label htmlFor="brief-company">Company / Project <span className="optional">(optional)</span><input id="brief-company" name="company" autoComplete="organization" maxLength={200} placeholder="Your team or product" value={brief.company} onChange={event => update("company", event.target.value)} /></label>
+    <label htmlFor="brief-question">What do you need help with?<textarea id="brief-question" name="question" required maxLength={4000} rows={3} placeholder="Share your product, business challenge and desired outcome." value={brief.question} onChange={event => update("question", event.target.value)} /></label>
+    <label htmlFor="brief-timeline">Timeline <span className="optional">(optional)</span><input id="brief-timeline" name="timeline" maxLength={200} placeholder="When would you like to begin?" value={brief.timeline || ""} onChange={event => update("timeline", event.target.value)} /></label>
+    <button className="button button-primary" type="submit">Open Email Draft <Arrow /></button>
     <p className="form-helper">Opens a draft to {ENQUIRY_EMAIL} with your details. Review it and press Send in your email app.</p>
     <p className="form-status" role="status" aria-live="polite">{status}</p>
     {prepared ? <div className="enquiry-email-options" aria-label="Email options">
