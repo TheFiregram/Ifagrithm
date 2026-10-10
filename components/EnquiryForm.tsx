@@ -2,33 +2,51 @@
 
 import { type FormEvent, useState } from "react";
 import { Arrow } from "./Brand";
-import { ENQUIRY_EMAIL, enquiryEmailUrl, enquiryGmailUrl, type Enquiry } from "../lib/enquiry";
+import { ENQUIRY_EMAIL, enquiryPayload, type Enquiry } from "../lib/enquiry";
 
 const emptyEnquiry: Enquiry = { name: "", email: "", company: "", question: "", timeline: "" };
 
 export default function EnquiryForm() {
   const [brief, setBrief] = useState<Enquiry>(emptyEnquiry);
-  const [prepared, setPrepared] = useState<Enquiry | null>(null);
+  const [pending, setPending] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [status, setStatus] = useState("");
 
   function update(field: keyof Enquiry, value: string) {
     setBrief(current => ({ ...current, [field]: value }));
-    setPrepared(null);
+    setSubmitted(false);
+    setFailed(false);
     setStatus("");
   }
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (pending || submitted) return;
     if (!event.currentTarget.reportValidity()) return;
     if (!brief.name.trim() || !brief.question.trim()) {
       setStatus("Complete your name and business challenge.");
       return;
     }
 
-    const enquiry = { name: brief.name.trim(), email: brief.email.trim(), company: brief.company.trim(), question: brief.question.trim(), timeline: brief.timeline?.trim() };
-    setPrepared(enquiry);
-    setStatus("Your email draft is ready. Review it and press Send in your email app. If it did not open, use an option below.");
-    window.location.href = enquiryEmailUrl(enquiry);
+    setPending(true);
+    setFailed(false);
+    setStatus("Submitting your demo request…");
+    try {
+      const response = await fetch("/api/enquiries", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(enquiryPayload(brief)), signal: AbortSignal.timeout(30000),
+      });
+      const result = await response.json();
+      if (!response.ok || result.ok !== true || !Number.isSafeInteger(result.id) || result.id <= 0) {
+        throw new Error(response.status === 429 ? "Too many requests. Please wait a few minutes and try again." : "We couldn’t submit your request. Please try again or contact us by email.");
+      }
+      setSubmitted(true);
+      setStatus(`Your demo request has been received. We’ll contact you at ${brief.email.trim()}.`);
+    } catch (error) {
+      setFailed(true);
+      setStatus(error instanceof Error && error.message.startsWith("Too many requests.") ? error.message : "We couldn’t submit your request. Please try again or contact us by email.");
+    } finally { setPending(false); }
   }
 
   return <form className="brief-form enter-item" onSubmit={submit}>
@@ -39,12 +57,9 @@ export default function EnquiryForm() {
     <label htmlFor="brief-company">Company / Project <span className="optional">(optional)</span><input id="brief-company" name="company" autoComplete="organization" maxLength={200} placeholder="Your team or product" value={brief.company} onChange={event => update("company", event.target.value)} /></label>
     <label htmlFor="brief-question">What do you need help with?<textarea id="brief-question" name="question" required maxLength={4000} rows={3} placeholder="Share your product, business challenge and desired outcome." value={brief.question} onChange={event => update("question", event.target.value)} /></label>
     <label htmlFor="brief-timeline">Timeline <span className="optional">(optional)</span><input id="brief-timeline" name="timeline" maxLength={200} placeholder="When would you like to begin?" value={brief.timeline || ""} onChange={event => update("timeline", event.target.value)} /></label>
-    <button className="button button-primary" type="submit">Open Email Draft <Arrow /></button>
-    <p className="form-helper">Opens a draft to {ENQUIRY_EMAIL} with your details. Review it and press Send in your email app.</p>
+    <button className="button button-primary" type="submit" disabled={pending || submitted}>{pending ? "Submitting…" : submitted ? "Request Received" : "Book a Demo"} <Arrow /></button>
+    <p className="form-helper">Send a demo request directly to IFAGRITHM.</p>
     <p className="form-status" role="status" aria-live="polite">{status}</p>
-    {prepared ? <div className="enquiry-email-options" aria-label="Email options">
-      <a className="enquiry-email" href={enquiryEmailUrl(prepared)}>Open draft again</a>
-      <a className="enquiry-email" href={enquiryGmailUrl(prepared)} target="_blank" rel="noopener noreferrer">Open in Gmail</a>
-    </div> : null}
+    {failed ? <a className="enquiry-email" href={`mailto:${ENQUIRY_EMAIL}`}>Contact {ENQUIRY_EMAIL}</a> : null}
   </form>;
 }

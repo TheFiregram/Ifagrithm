@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { capabilities, stages, sectors, questions, companyDescriptor, pageTitle, heroHeadline } from "../lib/site-content.ts";
-import { ENQUIRY_EMAIL, ENQUIRY_SUBJECT, enquiryEmailUrl, enquiryGmailUrl, enquiryMessage } from "../lib/enquiry.ts";
+import { ENQUIRY_EMAIL, ENQUIRY_SUBJECT, enquiryEmailUrl, enquiryGmailUrl, enquiryMessage, enquiryPayload } from "../lib/enquiry.ts";
 
 test("company identity and four scoped capabilities match the rebrand brief", () => {
   assert.equal(companyDescriptor, "Web3 Research & Business Services");
@@ -10,10 +10,16 @@ test("company identity and four scoped capabilities match the rebrand brief", ()
   assert.deepEqual(capabilities.map(item => item.tab), ["Research & Intelligence", "Data & Analytics", "Growth & Partnerships", "Custom Business Engagements"]);
   assert.match(capabilities[2].description, /suitable delivery capacity/);
   assert.match(capabilities[3].description, /assess the scope/);
-  assert.deepEqual(stages.map(item => item.title), ["Understand", "Define", "Deliver", "Review"]);
+  assert.deepEqual(stages.map(item => item.title), ["Desire", "Behaviour", "Business"]);
   assert.equal(sectors.length, 4);
   assert.equal(questions.length, 7);
   assert.match(questions[6].answer, /^No\./);
+});
+
+test("demo requests retain the optional timeline in the existing store payload", () => {
+  const enquiry = { name: " Ada ", email: " ada@example.com ", company: " Example ", question: " Study our users ", timeline: " November " };
+  assert.deepEqual(enquiryPayload(enquiry), {name:"Ada",email:"ada@example.com",company:"Example",question:"Study our users\n\nTimeline: November"});
+  assert.equal(enquiryPayload({...enquiry,timeline:undefined}).question,"Study our users");
 });
 
 test("project enquiry draft retains verified recipient and optional timeline", () => {

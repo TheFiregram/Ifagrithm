@@ -9,6 +9,13 @@ export type Enquiry = {
   timeline?: string;
 };
 
+export function enquiryPayload(enquiry: Enquiry) {
+  return {
+    name: enquiry.name.trim(), email: enquiry.email.trim(), company: enquiry.company.trim(),
+    question: enquiry.question.trim() + (enquiry.timeline?.trim() ? `\n\nTimeline: ${enquiry.timeline.trim()}` : ""),
+  };
+}
+
 export function enquiryMessage(enquiry: Enquiry): string {
   return [
     `Name: ${enquiry.name.trim()}`,
