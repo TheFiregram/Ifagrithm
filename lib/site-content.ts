@@ -2,7 +2,10 @@ export const companyDescriptor = "Web3 Research & Business Services";
 export const pageTitle = `IFAGRITHM | ${companyDescriptor}`;
 export const pageDescription = "IFAGRITHM partners with Web3 teams on competitor intelligence, user behaviour research, ecosystem studies, data analytics and scoped business services.";
 export const heroHeadline = "Research and business support for Web3 teams.";
-export const heroCopy = "IFAGRITHM partners with founders and teams to understand markets, competitors and users, analyse business activity, and work through defined business challenges with specialist research and support.";
+export const heroCopy = "We help businesses understand their markets, competitors, users and commercial opportunities through research, data intelligence and specialised business support.";
+export const companyIntroduction = "IFAGRITHM is a research and business services company working with Web3 startups and established teams.";
+export const companyWork = "Our work includes competitive intelligence, behavioural research, ecosystem studies, business analytics and custom research engagements.";
+export const companyExpansion = "As we grow, we aim to expand our specialised services and delivery partnerships to support more of the business needs of Web3 companies.";
 
 export const capabilities = [
   {tab:"Research & Intelligence", label:"01 / CORE CAPABILITY", lines:["Research &", "Intelligence"], description:"Investigate markets, competitors, users, ecosystems and emerging commercial opportunities. From focused competitor studies to behavioural and custom research."},
@@ -26,7 +29,7 @@ export const sectors = [
 ];
 
 export const questions = [
-  {question:"What exactly is IFAGRITHM?",answer:"IFAGRITHM is a Web3 research and business services company. We work with teams on research, data intelligence and selected specialist business challenges."},
+  {question:"What exactly is IFAGRITHM?",answer:companyIntroduction + " " + heroCopy},
   {question:"Are you a research firm or a marketing agency?",answer:"Research and business intelligence are our core. We may scope growth, distribution or partnership assignments where the fit and delivery capacity are clear."},
   {question:"What services can we request?",answer:"Common starting points include competitor research, user behaviour studies, ecosystem intelligence, commercial opportunity assessments and performance analysis. We consider custom requests."},
   {question:"Can we bring a problem that is not listed?",answer:"Yes. Describe the business problem, desired outcome and constraints. We will assess whether it fits our work or requires another specialist."},
